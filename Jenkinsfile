@@ -48,7 +48,7 @@ stages {
         steps {
             withCredentials([
                 usernamePassword(
-                    credentialsId: 'aws-credentials',
+                    credentialsId: 'robostore-aws',
                     usernameVariable: 'AWS_ACCESS_KEY_ID',
                     passwordVariable: 'AWS_SECRET_ACCESS_KEY'
                 )
