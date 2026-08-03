@@ -25,11 +25,11 @@ async function testDatabaseConnection() {
 try {
 const connection = await db.getConnection();
 
-```
+
 console.log("MySQL database connected successfully");
 
 connection.release();
-```
+
 
 } catch (error) {
 console.error("MySQL connection failed:", error.message);
@@ -48,13 +48,13 @@ app.get("/api/health", async (req, res) => {
 try {
 await db.query("SELECT 1");
 
-```
+
 res.json({
   status: "UP",
   database: "CONNECTED",
   service: "RoboStore Backend",
 });
-```
+
 
 } catch (error) {
 res.status(500).json({
@@ -72,18 +72,18 @@ const [products] = await db.query(
 "SELECT * FROM products ORDER BY id"
 );
 
-```
+
 res.json(products);
-```
+
 
 } catch (error) {
 console.error("Error fetching products:", error.message);
 
-```
+
 res.status(500).json({
   error: "Failed to fetch products",
 });
-```
+
 
 }
 });
@@ -96,7 +96,7 @@ const [products] = await db.query(
 [req.params.id]
 );
 
-```
+
 if (products.length === 0) {
   return res.status(404).json({
     error: "Product not found",
@@ -104,16 +104,16 @@ if (products.length === 0) {
 }
 
 res.json(products[0]);
-```
+
 
 } catch (error) {
 console.error("Error fetching product:", error.message);
 
-```
+
 res.status(500).json({
   error: "Failed to fetch product",
 });
-```
+
 
 }
 });
@@ -126,9 +126,9 @@ if (require.main === module) {
 app.listen(PORT, async () => {
 console.log(`RoboStore backend running on port ${PORT}`);
 
-```
+
 await testDatabaseConnection();
-```
+
 
 });
 }
