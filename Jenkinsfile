@@ -1,11 +1,15 @@
 pipeline {
 
+
 agent any
 
 environment {
     AWS_REGION = 'us-east-1'
-    ECR_REGISTRY = '281639841832.dkr.ecr.us-east-1.amazonaws.com'
-    AWS_CREDENTIALS = credentials('robostore-aws')
+    AWS_ACCOUNT_ID = '281639841832'
+    ECR_REGISTRY = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
+    EC2_HOST = '54.83.127.72'
+    EC2_USER = 'ubuntu'
+    SSH_KEY = '/var/jenkins_home/.ssh/robostore-key.pem'
 }
 
 stages {
@@ -46,13 +50,18 @@ stages {
 
     stage('Login to Amazon ECR') {
         steps {
-            sh '''
-                export AWS_ACCESS_KEY_ID="$AWS_CREDENTIALS_USR"
-                export AWS_SECRET_ACCESS_KEY="$AWS_CREDENTIALS_PSW"
-
-                aws ecr get-login-password --region $AWS_REGION | \
-                docker login --username AWS --password-stdin $ECR_REGISTRY
-            '''
+            withCredentials([
+                usernamePassword(
+                    credentialsId: 'aws-credentials',
+                    usernameVariable: 'AWS_ACCESS_KEY_ID',
+                    passwordVariable: 'AWS_SECRET_ACCESS_KEY'
+                )
+            ]) {
+                sh '''
+                    aws ecr get-login-password --region $AWS_REGION |
+                    docker login --username AWS --password-stdin $ECR_REGISTRY
+                '''
+            }
         }
     }
 
@@ -76,6 +85,31 @@ stages {
             '''
         }
     }
+
+    stage('Deploy to EC2') {
+        steps {
+            withCredentials([
+                usernamePassword(
+                    credentialsId: 'aws-credentials',
+                    usernameVariable: 'AWS_ACCESS_KEY_ID',
+                    passwordVariable: 'AWS_SECRET_ACCESS_KEY'
+                )
+            ]) {
+                sh '''
+                    ssh -o StrictHostKeyChecking=no \
+                        -i $SSH_KEY \
+                        $EC2_USER@$EC2_HOST "
+                            cd /home/ubuntu/robostore-deployment &&
+                            aws ecr get-login-password --region $AWS_REGION |
+                            docker login --username AWS --password-stdin $ECR_REGISTRY &&
+                            docker compose pull &&
+                            docker compose up -d &&
+                            docker image prune -f
+                        "
+                '''
+            }
+        }
+    }
 }
 
 post {
@@ -89,5 +123,6 @@ post {
     }
 
 }
+
 
 }
