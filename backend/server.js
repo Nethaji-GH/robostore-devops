@@ -10,11 +10,11 @@ app.use(express.json());
 
 // MySQL connection pool
 const db = mysql.createPool({
-  host: "localhost",
-  user: "robouser",
-  password: "robopassword",
-  database: "robostore",
-  port: 3306,
+  host: process.env.DB_HOST || "localhost",
+  user: process.env.DB_USER || "robouser",
+  password: process.env.DB_PASSWORD || "robopassword",
+  database: process.env.DB_NAME || "robostore",
+  port: process.env.DB_PORT || 3306,
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,
