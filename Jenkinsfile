@@ -93,7 +93,7 @@ stages {
                 ubuntu@54.83.127.72 \
                 "cd ~/robostore-deployment && \
                 docker compose pull && \
-                docker compose up -d && \
+                docker compose up -d --force-recreate && \
                 docker compose ps"
             '''
         }
