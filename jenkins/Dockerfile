@@ -2,6 +2,7 @@ FROM jenkins/jenkins:lts
 
 USER root
 
+# Install basic tools
 RUN apt-get update \
     && apt-get install -y ca-certificates curl \
     && install -m 0755 -d /etc/apt/keyrings \
@@ -16,7 +17,13 @@ RUN apt-get update \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-RUN groupadd -for -g 999 docker \
-    && usermod -aG docker jenkins
+# Install Node.js 22 and npm
+RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
+    && apt-get install -y nodejs \
+    && node --version \
+    && npm --version
+
+# Allow Jenkins to access Docker socket
+RUN usermod -aG root jenkins
 
 USER jenkins
