@@ -85,6 +85,19 @@ stages {
             '''
         }
     }
+  stage('Deploy to EC2') {
+    steps {
+        sh '''
+            ssh -o StrictHostKeyChecking=no \
+            -i /var/jenkins_home/.ssh/robostore-key.pem \
+            ubuntu@54.83.127.72 \
+            "cd ~/robostore-deployment && \
+             docker compose pull && \
+             docker compose up -d && \
+             docker compose ps"
+        '''
+    }
+}
 
     stage('Deploy to EC2') {
         steps {
