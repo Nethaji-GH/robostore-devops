@@ -1,6 +1,6 @@
 pipeline {
 
-```
+
 agent any
 
 environment {
@@ -110,6 +110,6 @@ post {
         echo 'RoboStore CI/CD pipeline failed.'
     }
 }
-```
+
 
 }
