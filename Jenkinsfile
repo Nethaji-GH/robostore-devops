@@ -99,31 +99,7 @@ stages {
     }
 }
 
-    stage('Deploy to EC2') {
-        steps {
-            withCredentials([
-                usernamePassword(
-                    credentialsId: 'aws-credentials',
-                    usernameVariable: 'AWS_ACCESS_KEY_ID',
-                    passwordVariable: 'AWS_SECRET_ACCESS_KEY'
-                )
-            ]) {
-                sh '''
-                    ssh -o StrictHostKeyChecking=no \
-                        -i $SSH_KEY \
-                        $EC2_USER@$EC2_HOST "
-                            cd /home/ubuntu/robostore-deployment &&
-                            aws ecr get-login-password --region $AWS_REGION |
-                            docker login --username AWS --password-stdin $ECR_REGISTRY &&
-                            docker compose pull &&
-                            docker compose up -d &&
-                            docker image prune -f
-                        "
-                '''
-            }
-        }
-    }
-}
+   
 
 post {
 
