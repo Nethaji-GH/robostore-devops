@@ -1,15 +1,11 @@
 pipeline {
 
-
+```
 agent any
 
 environment {
     AWS_REGION = 'us-east-1'
-    AWS_ACCOUNT_ID = '281639841832'
-    ECR_REGISTRY = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
-    EC2_HOST = '54.83.127.72'
-    EC2_USER = 'ubuntu'
-    SSH_KEY = '/var/jenkins_home/.ssh/robostore-key.pem'
+    ECR_REGISTRY = '281639841832.dkr.ecr.us-east-1.amazonaws.com'
 }
 
 stages {
@@ -58,7 +54,10 @@ stages {
                 )
             ]) {
                 sh '''
-                    aws ecr get-login-password --region $AWS_REGION |
+                    export AWS_ACCESS_KEY_ID="$AWS_ACCESS_KEY_ID"
+                    export AWS_SECRET_ACCESS_KEY="$AWS_SECRET_ACCESS_KEY"
+
+                    aws ecr get-login-password --region $AWS_REGION | \
                     docker login --username AWS --password-stdin $ECR_REGISTRY
                 '''
             }
@@ -85,21 +84,21 @@ stages {
             '''
         }
     }
-  stage('Deploy to EC2') {
-    steps {
-        sh '''
-            ssh -o StrictHostKeyChecking=no \
-            -i /var/jenkins_home/.ssh/robostore-key.pem \
-            ubuntu@54.83.127.72 \
-            "cd ~/robostore-deployment && \
-             docker compose pull && \
-             docker compose up -d && \
-             docker compose ps"
-        '''
+
+    stage('Deploy to EC2') {
+        steps {
+            sh '''
+                ssh -o StrictHostKeyChecking=no \
+                -i /var/jenkins_home/.ssh/robostore-key.pem \
+                ubuntu@54.83.127.72 \
+                "cd ~/robostore-deployment && \
+                docker compose pull && \
+                docker compose up -d && \
+                docker compose ps"
+            '''
+        }
     }
 }
-
-   
 
 post {
 
@@ -110,8 +109,7 @@ post {
     failure {
         echo 'RoboStore CI/CD pipeline failed.'
     }
-
 }
-
+```
 
 }
