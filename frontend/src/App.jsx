@@ -78,7 +78,7 @@ function App() {
         <section className="products" id="products">
 
           <h2>
-            Our Robotics Products
+            🚀  Robostore - DevOps CI/CD Pipeline Demo
           </h2>
 
           {loading && (
